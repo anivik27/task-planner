@@ -1,0 +1,61 @@
+spring:
+  config:
+    import: "optional:file:.env[.properties]"
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${POSTGRES_URL}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+
+  jpa:
+    properties:
+      hibernate:
+        show_sql: true
+        default_schema: auth
+        format_sql: true
+    hibernate:
+      ddl-auto: update
+
+  flyway:
+    schemas: main_service
+    default-schema: main_service
+    table: flyway_schema_history
+    baseline-on-migrate: true
+    enabled: true
+    baseline-version: 0
+    placeholders:
+      planner_service: ${POSTGRES_PLANNER_SERVICE_USER}
+      planner_password: ${POSTGRES_PLANNER_SERVICE_PASSWORD}
+
+  kafka:
+    bootstrap-servers: ${KAFKA_ADDRESS}
+
+
+server:
+  port: ${SERVER_PORT}
+
+app:
+  domain: ${SERVER_DOMAIN}
+
+  jwt-properties:
+    config:
+      token-life-time: 3600
+    credentials:
+      jwt-secret: ${SECRET_JWT}
+
+
+logging:
+  structured:
+    json:
+      enabled: true
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} [traceId=%X{traceId:-}, uri=%X{uri:-}] - %msg%n"
+  level:
+    org.springframework.web: DEBUG
+    org.springframework.web.servlet.mvc.method.annotation: TRACE
+    org.springframework.security: DEBUG
+    org.springframework.security.authentication: DEBUG
+    org.springframework.security.web.authentication: DEBUG
+    org.springframework.session: DEBUG
+    org.springframework.data.redis: DEBUG

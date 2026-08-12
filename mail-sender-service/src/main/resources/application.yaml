@@ -1,0 +1,38 @@
+spring:
+  config:
+    import: "optional:file:.env[.properties]"
+
+  kafka:
+    bootstrap-servers: ${KAFKA_ADDRESS}
+    consumer:
+      enable-auto-commit: false
+    listener:
+      ack-mode: record
+
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${SPRING_MAIL_LOGIN}
+    password: ${SPRING_MAIL_PASSWORD}
+
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+
+#server:
+#  port: 8082
+#
+#app:
+#  domain: localhost
+
+logging:
+  structured:
+    json:
+      enabled: true
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} [traceId=%X{traceId:-}, uri=%X{uri:-}] - %msg%n"

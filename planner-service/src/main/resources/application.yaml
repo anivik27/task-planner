@@ -1,0 +1,15 @@
+spring:
+  config:
+    import: "optional:file:.env[.properties]"
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${POSTGRES_URL}
+    username: ${POSTGRES_PLANNER_SERVICE_USER}
+    password: ${POSTGRES_PLANNER_SERVICE_PASSWORD}
+
+  kafka:
+    bootstrap-servers: ${KAFKA_ADDRESS}
+
+#server:
+#  port: 8083
