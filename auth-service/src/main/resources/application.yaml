@@ -9,20 +9,23 @@ spring:
     password: ${POSTGRES_PASSWORD}
 
   jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     properties:
       hibernate:
         show_sql: true
         default_schema: auth
         format_sql: true
+        temp:
+          use_jdbc_metadata_defaults: ${USE_JDBC_METADATA_DEFAULTS}
     hibernate:
-      ddl-auto: update
+      ddl-auto: ${HIBERNATE_DDL_AUTO}
 
   flyway:
+    enabled: ${FLYWAY_ENABLED}
     schemas: main_service
     default-schema: main_service
     table: flyway_schema_history
     baseline-on-migrate: true
-    enabled: true
     baseline-version: 0
     placeholders:
       planner_service: ${POSTGRES_PLANNER_SERVICE_USER}
@@ -33,6 +36,7 @@ spring:
 
 
 server:
+  address: ${SERVER_ADDRESS}
   port: ${SERVER_PORT}
 
 app:

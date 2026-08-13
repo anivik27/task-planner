@@ -1,0 +1,90 @@
+name: build and push
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-24.04
+
+    steps:
+
+      - uses: actions/checkout@v4
+
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: create env file in root directory
+        uses: SpicyPizza/create-envfile@v2.0
+        with:
+          file_name: '.env'
+          directory: '.'
+          envkey_IMAGE_TAG: ${{ github.sha }}
+          envkey_DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          envkey_SERVER_PORT: 1234
+          envkey_POSTGRES_URL: YOUR_URL_HERE
+          envkey_POSTGRES_USER: YOUR_USERNAME_HERE
+          envkey_POSTGRES_PASSWORD: YOUR_PASSWORD_HERE
+          envkey_KAFKA_NODE_ID: ${{ vars.KAFKA_NODE_ID }}
+          envkey_KAFKA_PROCESS_ROLES: '${{ vars.KAFKA_PROCESS_ROLES }}'
+          envkey_KAFKA_CONTROLLER_QUORUM_VOTERS: '${{ vars.KAFKA_CONTROLLER_QUORUM_VOTERS }}'
+          envkey_KAFKA_LISTENERS: '${{ vars.KAFKA_LISTENERS }}'
+          envkey_KAFKA_INTER_BROKER_LISTENER_NAME: '${{ vars.KAFKA_INTER_BROKER_LISTENER_NAME }}'
+          envkey_KAFKA_ADVERTISED_LISTENERS: '${{ vars.KAFKA_ADVERTISED_LISTENERS }}'
+          envkey_KAFKA_CONTROLLER_LISTENER_NAMES: '${{ vars.KAFKA_CONTROLLER_LISTENER_NAMES }}'
+          envkey_KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: '${{ vars.KAFKA_LISTENER_SECURITY_PROTOCOL_MAP }}'
+          envkey_CLUSTER_ID: '${{ vars.CLUSTER_ID }}'
+          envkey_KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: ${{ vars.KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR }}
+          envkey_KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: ${{ vars.KAFKA_TRANSACTION_STATE_LOG_MIN_ISR }}
+          envkey_KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: ${{ vars.KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR }}
+          envkey_KAFKA_LOG_DIRS: '${{ vars.KAFKA_LOG_DIRS }}'
+      - name: create env file in auth-service directory
+        uses: SpicyPizza/create-envfile@v2.0
+        with:
+          file_name: '.env'
+          directory: 'auth-service'
+          envkey_FLYWAY_ENABLED: false
+          envkey_HIBERNATE_DDL_AUTO: none
+          envkey_USE_JDBC_METADATA_DEFAULTS: false
+          envkey_IMAGE_TAG: ${{ github.sha }}
+#          envkey_POSTGRES_URL: YOUR_URL_HERE
+#          envkey_POSTGRES_USER: YOUR_USERNAME_HERE
+#          envkey_POSTGRES_PASSWORD: YOUR_PASSWORD_HERE
+#          envkey_POSTGRES_PLANNER_SERVICE_USER: YOUR_POSTGRES_PLANNER_SERVICE_USER_HERE
+#          envkey_POSTGRES_PLANNER_SERVICE_PASSWORD: YOUR_POSTGRES_PLANNER_SERVICE_PASSWORD
+#          envkey_SECRET_JWT: empty_jwt
+#          envkey_KAFKA_ADDRESS: ${{ vars.KAFKA_ADDRESS }}
+#          envkey_SERVER_DOMAIN: ${{ vars.SERVER_DOMAIN }}
+#          envkey_SERVER_PORT: 1234
+      - name: create env file in planner-service directory
+        uses: SpicyPizza/create-envfile@v2.0
+        with:
+          file_name: '.env'
+          directory: 'planner-service'
+          envkey_IMAGE_TAG: ${{ github.sha }}
+#          envkey_POSTGRES_URL: YOUR_URL_HERE
+#          envkey_POSTGRES_PLANNER_SERVICE_USER: YOUR_POSTGRES_PLANNER_SERVICE_USER_HERE
+#          envkey_POSTGRES_PLANNER_SERVICE_PASSWORD: YOUR_POSTGRES_PLANNER_SERVICE_PASSWORD
+#          envkey_KAFKA_ADDRESS: ${{ vars.KAFKA_ADDRESS }}
+      - name: create env file in mail-sender-service directory
+        uses: SpicyPizza/create-envfile@v2.0
+        with:
+          file_name: '.env'
+          directory: 'mail-sender-service'
+          envkey_IMAGE_TAG: ${{ github.sha }}
+#          envkey_MAIL_USERNAME: YOUR_USERNAME_HERE
+#          envkey_MAIL_PASSWORD: YOUR_PASSWORD_HERE
+#          envkey_MAIL_HOST: YOUR_HOST_HERE
+#          envkey_MAIL_PORT: YOUR_PORT_HERE
+#          envkey_KAFKA_ADDRESS: ${{ vars.KAFKA_ADDRESS }}
+
+      - name: Build
+        run: docker compose build auth-service mail-sender-service planner-service
+
+      - name: Push
+        run: docker compose push auth-service mail-sender-service planner-service

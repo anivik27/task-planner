@@ -1,0 +1,93 @@
+name: deploy
+
+on:
+  workflow_run:
+    workflows: ["build and push"]
+    types:
+      - completed
+    branches:
+      - main
+  workflow_dispatch:
+
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - name: SSH connect and use script
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.TASK_PLANNER_HOST }}
+          username: ${{ secrets.TASK_PLANNER_HOST_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY_TASK_PLANNER_HOST }}
+          port: ${{ secrets.TASK_PLANNER_HOST_TCP_PORT }}
+          script: |
+            echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login \
+            -u "${{ secrets.DOCKERHUB_USERNAME }}" \
+            --password-stdin
+          
+            cd /home/${{ secrets.TASK_PLANNER_HOST }}
+            mkdir -p auth-service mail-sender-service planner-service
+            cd /home/${{ secrets.TASK_PLANNER_HOST }}
+            cat << EOF > .env
+            IMAGE_TAG=${{ github.sha }}
+            DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
+            SERVER_ADDRESS=${{ vars.SERVER_ADDRESS }}
+            SERVER_PORT=${{ vars.SERVER_PORT }}
+            POSTGRES_URL=${{ vars.POSTGRES_URL }}
+            POSTGRES_USER=${{ POSTGRES_USER }} 
+            POSTGRES_PASSWORD=${{ POSTGRES_PASSWORD }}
+            KAFKA_NODE_ID=${{ vars.KAFKA_NODE_ID }}
+            KAFKA_PROCESS_ROLES='${{ vars.KAFKA_PROCESS_ROLES }}'
+            KAFKA_CONTROLLER_QUORUM_VOTERSэ'${{ vars.KAFKA_CONTROLLER_QUORUM_VOTERS }}'
+            KAFKA_LISTENERSэ'${{ vars.KAFKA_LISTENERS }}'
+            KAFKA_INTER_BROKER_LISTENER_NAME='${{ vars.KAFKA_INTER_BROKER_LISTENER_NAME }}'
+            KAFKA_ADVERTISED_LISTENERS='${{ vars.KAFKA_ADVERTISED_LISTENERS }}'
+            KAFKA_CONTROLLER_LISTENER_NAMES='${{ vars.KAFKA_CONTROLLER_LISTENER_NAMES }}'
+            KAFKA_LISTENER_SECURITY_PROTOCOL_MAP='${{ vars.KAFKA_LISTENER_SECURITY_PROTOCOL_MAP }}'
+            CLUSTER_ID='${{ vars.CLUSTER_ID }}'
+            KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=${{ vars.KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR }}
+            KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=${{ vars.KAFKA_TRANSACTION_STATE_LOG_MIN_ISR }}
+            KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=${{ vars.KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR }}
+            KAFKA_LOG_DIRS='${{ vars.KAFKA_LOG_DIRS }}'
+            EOF
+          
+            cd /home/${{ secrets.TASK_PLANNER_HOST }}/auth-service
+            cat << EOF > .env
+            FLYWAY_ENABLED=TRUE
+            HIBERNATE_DDL_AUTO=validate
+            USE_JDBC_METADATA_DEFAULTS=true
+            IMAGE_TAG=${{ github.sha }}
+            POSTGRES_URL=${{ vars.POSTGRES_URL }}
+            POSTGRES_USER=${{ secrets.POSTGRES_USER }} 
+            POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+            POSTGRES_PLANNER_SERVICE_USER=${{ secrets.POSTGRES_PLANNER_SERVICE_USER }}
+            POSTGRES_PLANNER_SERVICE_PASSWORD=${{ secrets.POSTGRES_PLANNER_SERVICE_PASSWORD }}
+            SECRET_JWT=${{ secrets.SECRET_JWT }}
+            KAFKA_ADDRESS=${{ vars.KAFKA_ADDRESS }}
+            SERVER_PORT=${{ vars.SERVER_PORT }}
+            EOF
+          
+            cd /home/${{ secrets.TASK_PLANNER_HOST }}/planner-service
+            cat << EOF > .env
+            IMAGE_TAG=${{ github.sha }}
+            POSTGRES_URL=${{ vars.POSTGRES_URL }}
+            POSTGRES_PLANNER_SERVICE_USERR=${{ POSTGRES_PLANNER_SERVICE_USER }}
+            POSTGRES_PLANNER_SERVICE_PASSWORD=${{ POSTGRES_PLANNER_SERVICE_PASSWORD }}
+            KAFKA_ADDRESS=${{ vars.KAFKA_ADDRESS }}
+            EOF
+          
+            cd /home/${{ secrets.TASK_PLANNER_HOST }}/mail-sender-service
+            cat << EOF > .env
+            IMAGE_TAG=${{ github.sha }}
+            MAIL_HOST=${{ secrets.MAIL_HOST }}
+            MAIL_PORT=${{ secrets.MAIL_PORT }}
+            MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}
+            MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}
+            KAFKA_ADDRESS=${{ vars.KAFKA_ADDRESS }}
+            EOF
+          
+            docker compose pull
+            docker compose up -d --build

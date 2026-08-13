@@ -8,8 +8,19 @@ spring:
     username: ${POSTGRES_PLANNER_SERVICE_USER}
     password: ${POSTGRES_PLANNER_SERVICE_PASSWORD}
 
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      hibernate:
+        show_sql: true
+        default_schema: auth
+        format_sql: true
+    hibernate:
+      ddl-auto: none
+
   kafka:
     bootstrap-servers: ${KAFKA_ADDRESS}
 
 #server:
+#  address: localhost
 #  port: 8083
