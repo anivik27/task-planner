@@ -1,12 +1,12 @@
 name: deploy
 
 on:
-  workflow_run:
-    workflows: ["build and push"]
-    types:
-      - completed
-    branches:
-      - main
+#  workflow_run:
+#    workflows: ["build and push"]
+#    types:
+#      - completed
+#    branches:
+#      - main
   workflow_dispatch:
 
 
@@ -16,8 +16,25 @@ jobs:
 ##    if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
+      - name: Checkout only docker-compose.yaml
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            docker-compose.yaml
+          sparse-checkout-cone-mode: false
+
+#      - name: Copy docker compose on host
+#        uses: appleboy/scp-action@master
+#        with:
+#          host: ${{ secrets.TASK_PLANNER_HOST }}
+#          username: ${{ secrets.TASK_PLANNER_HOST_USERNAME }}
+#          key: ${{ secrets.SSH_PRIVATE_KEY_TASK_PLANNER_HOST }}
+#          port: ${{ secrets.TASK_PLANNER_HOST_TCP_PORT }}
+#          source: "docker-compose.yaml"
+#          target: "/home/${{ secrets.TASK_PLANNER_HOST_USERNAME }}"
+
       - name: SSH connect and use script
-        uses: appleboy/ssh-action@v1
+        uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.TASK_PLANNER_HOST }}
           username: ${{ secrets.TASK_PLANNER_HOST_USERNAME }}
@@ -88,6 +105,8 @@ jobs:
             MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}
             KAFKA_ADDRESS=${{ vars.KAFKA_ADDRESS }}
             EOF
+            
+            scp ./docker-compose.yaml ${{ secrets.TASK_PLANNER_HOST_USERNAME }}@${{ secrets.TASK_PLANNER_HOST }}:/home/${{ secrets.TASK_PLANNER_HOST_USERNAME }}/docker-compose.yaml
           
             docker compose pull
             docker compose up -d --build
