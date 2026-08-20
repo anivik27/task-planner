@@ -53,7 +53,7 @@ jobs:
             DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
             SERVER_ADDRESS=${{ vars.SERVER_ADDRESS }}
             SERVER_PORT=${{ vars.SERVER_PORT }}
-            POSTGRES_DB=${{ vars.POSTGRES_DB }}
+            POSTGRES_DB=${{ secrets.POSTGRES_DB }}
             POSTGRES_USER=${{ secrets.POSTGRES_USER }}
             POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
             KAFKA_NODE_ID=${{ vars.KAFKA_NODE_ID }}
@@ -77,7 +77,7 @@ jobs:
             HIBERNATE_DDL_AUTO=validate
             USE_JDBC_METADATA_DEFAULTS=true
             IMAGE_TAG=${{ github.sha }}
-            POSTGRES_DB=${{ vars.POSTGRES_DB }}
+            POSTGRES_DB=${{ secrets.POSTGRES_DB }}
             POSTGRES_USER=${{ secrets.POSTGRES_USER }}
             POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
             POSTGRES_PLANNER_SERVICE_USER=${{ secrets.POSTGRES_PLANNER_SERVICE_USER }}
@@ -90,7 +90,7 @@ jobs:
             cd /home/${{ secrets.TASK_PLANNER_HOST_USERNAME }}/planner-service
             cat << EOF > .env
             IMAGE_TAG=${{ github.sha }}
-            POSTGRES_DB=${{ vars.POSTGRES_DB }}
+            POSTGRES_DB=${{ secrets.POSTGRES_DB }}
             POSTGRES_PLANNER_SERVICE_USER=${{ secrets.POSTGRES_PLANNER_SERVICE_USER }}
             POSTGRES_PLANNER_SERVICE_PASSWORD=${{ secrets.POSTGRES_PLANNER_SERVICE_PASSWORD }}
             KAFKA_ADDRESS=${{ vars.KAFKA_ADDRESS }}
