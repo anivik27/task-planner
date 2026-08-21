@@ -45,6 +45,12 @@ services:
       - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=${KAFKA_TRANSACTION_STATE_LOG_MIN_ISR}
       - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=${KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR}
       - KAFKA_LOG_DIRS=${KAFKA_LOG_DIRS}
+    healthcheck:
+      test: [ "CMD-SHELL", "kafka-broker-api-versions.sh --bootstrap-server localhost:9092 || exit 1" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   auth-service:
     image: ${DOCKERHUB_USERNAME}/task-planner:auth-service-${IMAGE_TAG}
