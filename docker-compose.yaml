@@ -48,7 +48,7 @@ services:
       - KAFKA_LOG_DIRS=${KAFKA_LOG_DIRS}
     healthcheck:
       test: [ "CMD-SHELL", "kafka-broker-api-versions.sh --bootstrap-server kafka:9092 || exit 1" ]
-      interval: 5s
+      interval: 10s
       timeout: 5s
       retries: 5
       start_period: 30s

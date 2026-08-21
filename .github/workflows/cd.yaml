@@ -78,6 +78,7 @@ jobs:
             HIBERNATE_DDL_AUTO=validate
             USE_JDBC_METADATA_DEFAULTS=true
             IMAGE_TAG=${{ github.sha }}
+            POSTGRES_DB=${{ secrets.POSTGRES_DB }}
             POSTGRES_URL=${{ secrets.POSTGRES_URL }}
             POSTGRES_USER=${{ secrets.POSTGRES_USER }}
             POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
