@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgres:17-alpine
-    container_name: auth-service-database-postgres
+    container_name: postgres
     restart: always
     volumes:
       - postgres-data:/var/lib/postgresql/data
