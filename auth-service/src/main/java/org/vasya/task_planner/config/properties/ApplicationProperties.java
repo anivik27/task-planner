@@ -5,4 +5,4 @@ import org.springframework.boot.context.properties.bind.Name;
 import org.vasya.task_planner.security.authentication.jwt.properties.JwtProperties;
 
 @ConfigurationProperties(prefix = "app")
-public record ApplicationProperties(String domain, @Name("jwt-properties") JwtProperties jwtProperties) {}
+public record ApplicationProperties(@Name("jwt-properties") JwtProperties jwtProperties) {}

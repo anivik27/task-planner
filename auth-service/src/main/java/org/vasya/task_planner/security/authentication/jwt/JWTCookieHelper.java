@@ -21,7 +21,6 @@ public class JWTCookieHelper {
     public void setJWT(String jwt, HttpServletResponse response) {
         Cookie jwtCookie = new Cookie("jwt-auth", jwt);
         jwtCookie.setMaxAge(Integer.parseInt(appProps.jwtProperties().config().tokenLifeTime()));
-        jwtCookie.setDomain(appProps.domain());
         jwtCookie.setPath("/");
         jwtCookie.setHttpOnly(true);
         jwtCookie.setSecure(false);

@@ -41,8 +41,6 @@ server:
   port: ${SERVER_PORT}
 
 app:
-  domain: ${SERVER_DOMAIN}
-
   jwt-properties:
     config:
       token-life-time: 3600

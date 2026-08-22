@@ -86,6 +86,7 @@ jobs:
             POSTGRES_PLANNER_SERVICE_PASSWORD=${{ secrets.POSTGRES_PLANNER_SERVICE_PASSWORD }}
             SECRET_JWT=${{ secrets.SECRET_JWT }}
             KAFKA_ADDRESS=${{ vars.KAFKA_ADDRESS }}
+            SERVER_ADDRESS=${{ vars.SERVER_ADDRESS }}
             SERVER_PORT=${{ vars.SERVER_PORT }}
             EOF
 
