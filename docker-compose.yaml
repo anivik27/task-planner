@@ -10,7 +10,7 @@ services:
     networks:
       - task-planner-network
     environment:
-      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_DB=auth
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     healthcheck:

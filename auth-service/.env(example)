@@ -7,8 +7,9 @@ SECRET_JWT=
 KAFKA_ADDRESS=
 SERVER_ADDRESS=
 SERVER_PORT=
+SERVER_DOMAIN=
 
-#for build without database connection
+#build with ignore database connection
 FLYWAY_ENABLED=true#false
 HIBERNATE_DDL_AUTO=validate#none
 USE_JDBC_METADATA_DEFAULTS=true#false
