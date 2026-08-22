@@ -13,7 +13,7 @@ services:
        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
        POSTGRES_DB: auth
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER}"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d auth"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -65,6 +65,11 @@ services:
       - task-planner-network
     env_file:
       - ./auth-service/.env
+    healthcheck:
+      test: [ "CMD-SHELL", "nc -z localhost ${SERVER_PORT} || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   mail-sender-service:
     image: ${DOCKERHUB_USERNAME}/task-planner:mail-sender-service-${IMAGE_TAG}
@@ -78,15 +83,21 @@ services:
       - task-planner-network
     env_file:
       - ./mail-sender-service/.env
+    healthcheck:
+      test: [ "CMD-SHELL", "pgrep -f java || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
 
   planner-service:
     image: ${DOCKERHUB_USERNAME}/task-planner:planner-service-${IMAGE_TAG}
     build: ./planner-service
     depends_on:
       mail-sender-service:
-        condition: service_completed_successfully
+        condition: service_healthy
       auth-service:
-        condition: service_completed_successfully
+        condition: service_healthy
     #    ports:
     #      - "8082:8082"
     networks:
