@@ -83,7 +83,7 @@ jobs:
             SECRET_JWT=${{ secrets.SECRET_JWT }}
             KAFKA_ADDRESS=${{ vars.KAFKA_ADDRESS }}
             SERVER_ADDRESS=${{ vars.SERVER_ADDRESS }}
-            SERVER_PORT=${{ secrets.SERVER_PORT }}
+            SERVER_PORT=${{ vars.SERVER_PORT }}
             EOF
 
             cd /home/${{ secrets.TASK_PLANNER_HOST_USERNAME }}/planner-service
