@@ -1,0 +1,5 @@
+rootProject.name = 'task-planner'
+
+include('auth-service')
+include('mail-sender-service')
+include('planner-service')
