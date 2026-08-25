@@ -13,7 +13,8 @@ RUN chmod +x gradlew
 RUN --mount=type=cache,target=/root/.gradle \
     ./gradlew dependencies --no-daemon
 
-COPY src ./src
+#COPY src ./src
+COPY . .
 
 #RUN ./gradlew bootJar --no-daemon
 

@@ -83,8 +83,19 @@ jobs:
 #          envkey_MAIL_PORT: YOUR_PORT_HERE
 #          envkey_KAFKA_ADDRESS: ${{ vars.KAFKA_ADDRESS }}
 
-      - name: Build
-        run: docker compose build auth-service mail-sender-service planner-service
+      - name: Setup Buildx
+        uses: docker/setup-buildx-action@v4
 
-      - name: Push
-        run: docker compose push auth-service mail-sender-service planner-service
+#      - name: Build
+#        run: docker compose build auth-service mail-sender-service planner-service
+#
+#      - name: Push
+#        run: docker compose push auth-service mail-sender-service planner-service
+
+      - name: Build and push services
+        uses: docker/bake-action@v7
+        with:
+          files: |
+            docker-compose.yaml
+            docker-bake.hcl
+          push: true
